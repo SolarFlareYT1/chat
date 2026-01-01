@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Chat</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+    }
+    #chat {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #444;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    input, button {
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Chat Room</h2>
+
+<div id="chat"></div>
+
+<input id="name" placeholder="Name">
+<input id="message" placeholder="Message">
+<button onclick="send()">Send</button>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  // 🔴 PASTE YOUR FIREBASE CONFIG HERE
+  var firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "ID",
+    appId: "APP_ID"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.database().ref("messages");
+
+  function send() {
+    var name = document.getElementById("name").value;
+    var msg = document.getElementById("message").value;
+
+    if (name && msg) {
+      db.push({
+        name: name,
+        message: msg
+      });
+      document.getElementById("message").value = "";
+    }
+  }
+
+  db.on("child_added", function(snapshot) {
+    var data = snapshot.val();
+    var chat = document.getElementById("chat");
+    chat.innerHTML += "<p><b>" + data.name + ":</b> " + data.message + "</p>";
+    chat.scrollTop = chat.scrollHeight;
+  });
+</script>
+
+</body>
+</html>
